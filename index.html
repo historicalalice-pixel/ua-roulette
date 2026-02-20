@@ -4,18 +4,18 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>UA Travel Roulette — 3D Carousel</title>
+  <meta name="description" content="3D-карусель туристичних місць України: маршрути 1–2 дні, фільтри, без повторів." />
 
   <style>
     :root{
       --bg1:#060914;
       --bg2:#0b1028;
-      --card:#10183acc;
       --stroke:#ffffff1a;
       --text:#eaf0ff;
       --muted:#aab6e6;
       --accent:#7aa6ff;
       --accent2:#00ffd5;
-      --warn:#ffd166;
+      --danger:#ff6b6b;
       --shadow: 0 22px 70px rgba(0,0,0,.55);
     }
     *{box-sizing:border-box}
@@ -32,8 +32,8 @@
     }
     .app{width:min(1100px,100%); margin:0 auto; display:grid; gap:14px;}
     header{display:flex; justify-content:space-between; align-items:flex-end; gap:12px; flex-wrap:wrap;}
-    h1{margin:0; font-size:clamp(22px,3vw,30px); font-weight:950; letter-spacing:.2px}
-    .sub{margin:6px 0 0; color:var(--muted); font-size:14px; line-height:1.4; max-width: 60ch;}
+    h1{margin:0; font-size:clamp(22px,3vw,30px); font-weight:950}
+    .sub{margin:6px 0 0; color:var(--muted); font-size:14px; line-height:1.4; max-width: 65ch;}
     .pills{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;}
     .pill{border:1px solid var(--stroke); background:#ffffff0b; color:var(--muted); border-radius:999px; padding:7px 10px; font-size:12px;}
 
@@ -47,17 +47,33 @@
       overflow:hidden;
       box-shadow:var(--shadow);
     }
-    .cardHead{padding:14px; border-bottom:1px solid var(--stroke); display:flex; justify-content:space-between; gap:10px; align-items:center;}
+    .cardHead{
+      padding:14px;
+      border-bottom:1px solid var(--stroke);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
     .cardHead h2{margin:0; font-size:14px; color:var(--muted); letter-spacing:.2px; font-weight:900; text-transform:uppercase;}
     .controls{display:flex; gap:10px; flex-wrap:wrap;}
+
     button{
-      appearance:none; border:1px solid var(--stroke); background:#ffffff10; color:var(--text);
-      padding:12px 14px; border-radius:12px; font-weight:900; cursor:pointer;
+      appearance:none;
+      border:1px solid var(--stroke);
+      background:#ffffff10;
+      color:var(--text);
+      padding:12px 14px;
+      border-radius:12px;
+      font-weight:900;
+      cursor:pointer;
       transition: transform .06s ease, background .2s ease, opacity .2s ease, border-color .2s ease;
       font-size:14px;
     }
     button:hover{background:#ffffff18}
     button:active{transform: translateY(1px)}
+    button:disabled{opacity:.65; cursor:not-allowed}
     .primary{border-color:#7aa6ff55; background:linear-gradient(180deg,#7aa6ff2a,#7aa6ff14)}
     .primary:hover{background:#7aa6ff33}
     .ghost{background:transparent}
@@ -83,17 +99,14 @@
       width: min(820px, 100%);
       height: 420px;
       transform-style: preserve-3d;
-      transition: transform 1100ms cubic-bezier(.2,.8,.2,1);
+      transition: transform 1050ms cubic-bezier(.2,.8,.2,1);
     }
-
     .c-card{
       position:absolute;
       left:50%;
       top:50%;
       width: 320px;
       height: 410px;
-      transform-style: preserve-3d;
-      transform-origin: center center;
       border:1px solid var(--stroke);
       border-radius: 18px;
       overflow:hidden;
@@ -101,23 +114,41 @@
       box-shadow: 0 18px 50px rgba(0,0,0,.45);
       translate:-50% -50%;
       cursor:pointer;
-      transition: filter .2s ease, transform 1100ms cubic-bezier(.2,.8,.2,1), opacity .2s ease;
+      transition: filter .2s ease, transform 1050ms cubic-bezier(.2,.8,.2,1), opacity .2s ease;
+      user-select:none;
     }
     .c-card:hover{filter: brightness(1.05)}
-    .c-card .img{
-      height: 55%;
-      background:#111;
-      position:relative;
-    }
-    .c-card img{
-      width:100%; height:100%; object-fit:cover; display:block;
-      transform: scale(1.02);
-      filter: saturate(1.05) contrast(1.02);
-    }
+    .img{height:55%; position:relative; background:#090b14;}
+    .img img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:none;}
     .shade{
       position:absolute; inset:0;
-      background: linear-gradient(180deg, #0000 55%, #000b 100%);
+      background: linear-gradient(180deg, #0000 55%, #000c 100%);
+      pointer-events:none;
     }
+    /* Poster placeholder (always visible) */
+    .poster{
+      position:absolute;
+      inset:0;
+      display:grid;
+      align-content:end;
+      padding:14px;
+      gap:8px;
+      background:
+        radial-gradient(550px 250px at 30% 30%, #7aa6ff33, transparent 65%),
+        radial-gradient(500px 240px at 70% 65%, #00ffd520, transparent 70%),
+        linear-gradient(180deg,#0b1028,#060914);
+    }
+    .poster .pTitle{font-weight:950; font-size:18px; line-height:1.1}
+    .poster .pMeta{color:var(--muted); font-size:12px}
+    .poster .pBadges{display:flex; gap:6px; flex-wrap:wrap}
+    .poster .pBadge{
+      font-size:11px; padding:6px 9px;
+      border:1px solid var(--stroke);
+      border-radius:999px;
+      background:#ffffff0b;
+      color:var(--muted);
+    }
+
     .c-body{padding:12px;}
     .title{font-weight:950; font-size:18px; line-height:1.1; letter-spacing:.2px; margin:2px 0 6px;}
     .meta{color:var(--muted); font-size:12px; line-height:1.4;}
@@ -137,8 +168,9 @@
       pointer-events:none;
     }
 
-    /* Details panel */
-    .details{padding:14px; display:grid; gap:12px;}
+    /* Details */
+    .details{padding:14px; display:none; gap:12px;}
+    .details.show{display:grid}
     .box{border:1px solid var(--stroke); background:#ffffff07; border-radius:14px; padding:12px;}
     .box h3{margin:0 0 8px; font-size:14px; letter-spacing:.2px}
     .box p{margin:0; color:var(--muted); line-height:1.55; font-size:14px}
@@ -162,7 +194,26 @@
       font-weight:700;
     }
     .small{font-size:12px; color:var(--muted); line-height:1.4;}
-    .count{font-weight:900; color:var(--text)}
+    .count{font-weight:950; color:var(--text)}
+
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:18px;
+      transform:translateX(-50%);
+      background:#000000aa;
+      border:1px solid var(--stroke);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius:12px;
+      backdrop-filter: blur(10px);
+      font-size:13px;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .25s ease, transform .25s ease;
+      z-index:50;
+    }
+    .toast.show{opacity:1; transform:translateX(-50%) translateY(-4px);}
   </style>
 </head>
 
@@ -172,27 +223,26 @@
       <div>
         <h1>🌀 UA Travel Roulette — 3D Carousel</h1>
         <div class="sub">
-          Натисни <b>Крутити</b> — карусель “докручує” до випадкового місця <b>без повторів</b>.
+          Натисни <b>Крутити</b> — карусель докручує до випадкового місця <b>без повторів</b>.
           Клік по центральній картці — деталі та маршрут на <b>1/2 дні</b>.
         </div>
       </div>
       <div class="pills">
         <div class="pill">3D-карусель</div>
-        <div class="pill">Фото</div>
+        <div class="pill">Фото (опціонально)</div>
         <div class="pill">Фільтри</div>
         <div class="pill"><span id="leftCount">—</span> місць</div>
       </div>
     </header>
 
     <div class="grid">
-      <!-- Main: carousel + details -->
       <section class="card">
         <div class="cardHead">
           <h2>Карусель</h2>
           <div class="controls">
             <button class="primary" id="spinBtn">🎲 Крутити</button>
             <button class="ghost" id="toggleDetailsBtn">📌 Деталі</button>
-            <button class="danger" id="resetBtn" title="Скинути унікальність">♻️ Скинути</button>
+            <button class="danger" id="resetBtn">♻️ Скинути</button>
           </div>
         </div>
 
@@ -204,7 +254,7 @@
           </div>
         </div>
 
-        <div class="details" id="details" style="display:none;">
+        <div class="details" id="details">
           <div class="box">
             <h3 id="dTitle">—</h3>
             <p id="dDesc">Натисни “Крутити”.</p>
@@ -213,7 +263,7 @@
             <h3>Маршрут</h3>
             <div id="dRoute"></div>
             <p class="small" style="margin-top:10px;">
-              ⚠️ В Україні триває війна. Перед поїздкою перевір тривоги/обмеження/комендантську годину та актуальність місць.
+              ⚠️ В Україні триває війна. Перед поїздкою перевір тривоги/обмеження/комендантську годину та актуальність локацій.
             </p>
           </div>
           <div class="actionRow">
@@ -224,7 +274,6 @@
         </div>
       </section>
 
-      <!-- Side: filters -->
       <aside class="card">
         <div class="cardHead">
           <h2>Фільтри</h2>
@@ -232,12 +281,10 @@
         </div>
         <div class="filters">
           <div class="row">
-            <label>
-              Регіон
+            <label>Регіон
               <select id="regionSel"></select>
             </label>
-            <label>
-              Тривалість
+            <label>Тривалість
               <select id="daysSel">
                 <option value="1">1 день</option>
                 <option value="2">2 дні</option>
@@ -246,12 +293,10 @@
           </div>
 
           <div class="row">
-            <label>
-              Категорія
+            <label>Категорія
               <select id="catSel"></select>
             </label>
-            <label>
-              Пошук
+            <label>Пошук
               <input id="searchInp" placeholder="озеро, фортеця, Карпати…" />
             </label>
           </div>
@@ -266,10 +311,12 @@
     </div>
   </div>
 
+  <div class="toast" id="toast"></div>
+
 <script>
 /* =========================
-   DATA (можеш розширювати)
-   Фото — Unsplash Source (без ключа), норм для MVP.
+   DATA
+   photoQuery -> намагаємось взяти онлайн фото, але UI НЕ залежить від нього.
 ========================= */
 const PLACES = [
   {
@@ -279,7 +326,7 @@ const PLACES = [
     category:"Природа",
     duration:[1,2],
     tags:["Карпати","озеро","прогулянка"],
-    photoQuery:"Synevyr lake Carpathians Ukraine",
+    photoQuery:"Synevyr lake Ukraine",
     coord:"48.6170,23.6890",
     desc:"Найвідоміше гірське озеро України: хвойні схили, тиша і легкі маршрути.",
     day1:["Коло навколо озера + оглядові","Еко-стежка в лісі","Колиба/кава поруч"],
@@ -292,7 +339,7 @@ const PLACES = [
     category:"Історія",
     duration:[1,2],
     tags:["фортеця","старе місто","каньйон"],
-    photoQuery:"Kamianets-Podilskyi fortress Ukraine",
+    photoQuery:"Kamianets-Podilskyi fortress",
     coord:"48.6730,26.5780",
     desc:"Фортеця + старе місто з атмосферними вулицями і видами на каньйон Смотрича.",
     day1:["Фортеця (екскурсія/музеї)","Старе місто (площа, ратуша)","Оглядові на каньйон на заході"],
@@ -305,10 +352,10 @@ const PLACES = [
     category:"Природа",
     duration:[1,2],
     tags:["скелі","похід","історія"],
-    photoQuery:"Tustan fortress rocks Ukraine",
+    photoQuery:"Tustan rocks Ukraine",
     coord:"49.2153,23.4110",
-    desc:"Скельний комплекс і історія фортеці: природа + оглядові — дуже “кінематографічно”.",
-    day1:["Підйом до скель і оглядові","Візит-центр (якщо відкр.)","Фото на заході"],
+    desc:"Скельний комплекс і історія фортеці: природа + оглядові — “кінематографічно”.",
+    day1:["Підйом до скель і оглядові","Візит-центр (якщо відкрито)","Фото на заході"],
     day2:["Легкий хайк у районі Урича","Додаткові панорами","Східниця/кава (опційно)"]
   },
   {
@@ -318,7 +365,7 @@ const PLACES = [
     category:"Природа",
     duration:[1,2],
     tags:["панорама","річка","пейзаж"],
-    photoQuery:"Dniester canyon Ukraine viewpoint",
+    photoQuery:"Dniester canyon Ukraine",
     coord:"",
     desc:"Панорами над Дністром — топ для оглядових і фото на золотій годині.",
     day1:["1–2 оглядові точки","Прогулянка стежками","Захід сонця/фото"],
@@ -331,9 +378,9 @@ const PLACES = [
     category:"Місто",
     duration:[1],
     tags:["UNESCO","архітектура","музей"],
-    photoQuery:"Saint Sophia Cathedral Kyiv Ukraine",
+    photoQuery:"Saint Sophia Cathedral Kyiv",
     coord:"50.4529,30.5144",
-    desc:"Культова пам’ятка Києва: архітектура, музейний комплекс і історичний контекст.",
+    desc:"Культова пам’ятка Києва: архітектура, музейний комплекс і сильний історичний контекст.",
     day1:["Собор + експозиції","Дзвінниця (якщо доступно)","Прогулянка центром поруч"],
     day2:[]
   },
@@ -344,26 +391,20 @@ const PLACES = [
     category:"Відпочинок",
     duration:[2],
     tags:["озера","пляж","релакс"],
-    photoQuery:"Svitiaz lake Shatsk Ukraine",
+    photoQuery:"Svitiaz lake Ukraine",
     coord:"",
-    desc:"Вода, пляжі, прогулянки — ідеально на 2 дні для перезавантаження.",
+    desc:"Вода, пляжі, прогулянки — ідеально на 2 дні (в сезон).",
     day1:["Заїзд + пляж","Велопрогулянка","Захід сонця біля води"],
     day2:["Ранкова прогулянка","Короткий маршрут лісом","Виїзд"]
   }
 ];
 
-/* =========================
-   STATE / FILTERS / UNIQUE
-========================= */
-const SEEN_KEY = "ua_carousel_seen_v1";
+const SEEN_KEY = "ua_carousel_seen_v3";
 let seen = loadSeen();
-
-function loadSeen(){
-  try { return new Set(JSON.parse(localStorage.getItem(SEEN_KEY) || "[]")); }
-  catch { return new Set(); }
-}
+function loadSeen(){ try { return new Set(JSON.parse(localStorage.getItem(SEEN_KEY) || "[]")); } catch { return new Set(); } }
 function saveSeen(){ localStorage.setItem(SEEN_KEY, JSON.stringify([...seen])); }
 
+/* UI refs */
 const regionSel = document.getElementById("regionSel");
 const catSel = document.getElementById("catSel");
 const daysSel = document.getElementById("daysSel");
@@ -371,39 +412,25 @@ const searchInp = document.getElementById("searchInp");
 const applyBtn = document.getElementById("applyBtn");
 const leftCount = document.getElementById("leftCount");
 const countTxt = document.getElementById("countTxt");
-
 const carouselEl = document.getElementById("carousel");
 const spinBtn = document.getElementById("spinBtn");
 const resetBtn = document.getElementById("resetBtn");
 const toggleDetailsBtn = document.getElementById("toggleDetailsBtn");
 const detailsEl = document.getElementById("details");
-
 const dTitle = document.getElementById("dTitle");
 const dDesc = document.getElementById("dDesc");
 const dRoute = document.getElementById("dRoute");
 const mapsBtn = document.getElementById("mapsBtn");
 const shareBtn = document.getElementById("shareBtn");
 const officialBtn = document.getElementById("officialBtn");
+const toast = document.getElementById("toast");
 
-let filtered = [];
-let currentIndex = 0;   // index within filtered array (central)
-let angle = 0;
-let spinning = false;
-
-function photoUrl(query){
-  return `https://source.unsplash.com/featured/900x700/?${encodeURIComponent(query)}`;
+function showToast(msg){
+  toast.textContent = msg;
+  toast.classList.add("show");
+  setTimeout(()=>toast.classList.remove("show"), 2200);
 }
-function mapsUrl(place){
-  if (place.coord && place.coord.includes(",")) return `https://www.google.com/maps?q=${encodeURIComponent(place.coord)}`;
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name + " Україна")}`;
-}
-function officialUrl(){
-  return "https://alerts.in.ua/";
-}
-
-function unique(arr){
-  return [...new Set(arr)];
-}
+function unique(arr){ return [...new Set(arr)]; }
 function fillSelect(sel, values){
   sel.innerHTML = "";
   values.forEach(v=>{
@@ -413,11 +440,19 @@ function fillSelect(sel, values){
     sel.appendChild(o);
   });
 }
+fillSelect(regionSel, ["Всі", ...unique(PLACES.map(p=>p.region)).sort()]);
+fillSelect(catSel, ["Всі", ...unique(PLACES.map(p=>p.category)).sort()]);
 
-const REGIONS = ["Всі", ...unique(PLACES.map(p=>p.region)).sort()];
-const CATS = ["Всі", ...unique(PLACES.map(p=>p.category)).sort()];
-fillSelect(regionSel, REGIONS);
-fillSelect(catSel, CATS);
+let filtered = [];
+let currentIndex = 0;
+let angle = 0;
+let spinning = false;
+let lastWinner = null;
+
+/* Photo: try load from "source.unsplash.com". If blocked — poster remains. */
+function onlinePhotoUrl(query){
+  return `https://source.unsplash.com/featured/900x700/?${encodeURIComponent(query || "Ukraine travel")}`;
+}
 
 function applyFilters(){
   const reg = regionSel.value;
@@ -431,12 +466,7 @@ function applyFilters(){
     if (!p.duration.includes(days)) return false;
     if (seen.has(p.id)) return false;
     if (q){
-      const hay = [
-        p.name, p.region, p.category, p.desc,
-        ...(p.tags||[]),
-        ...(p.day1||[]),
-        ...(p.day2||[])
-      ].join(" ").toLowerCase();
+      const hay = [p.name,p.region,p.category,p.desc,(p.tags||[]).join(" "),(p.day1||[]).join(" "),(p.day2||[]).join(" ")].join(" ").toLowerCase();
       if (!hay.includes(q)) return false;
     }
     return true;
@@ -445,107 +475,34 @@ function applyFilters(){
   leftCount.textContent = filtered.length;
   countTxt.textContent = filtered.length;
 
-  // Якщо нічого нема — покажемо порожньо, але не падаємо
   currentIndex = 0;
   angle = 0;
   renderCarousel();
-}
 
+  if (!filtered.length){
+    showToast("Під цей фільтр місця закінчились. “Скинути” або зміни фільтр.");
+  }
+}
 applyBtn.addEventListener("click", applyFilters);
 regionSel.addEventListener("change", applyFilters);
 catSel.addEventListener("change", applyFilters);
 daysSel.addEventListener("change", applyFilters);
 searchInp.addEventListener("keydown", (e)=>{ if(e.key==="Enter") applyFilters(); });
 
-/* =========================
-   3D CAROUSEL RENDER
-========================= */
-function renderCarousel(){
-  carouselEl.innerHTML = "";
-
-  const items = filtered.length ? filtered : [{ name:"Немає місць", region:"—", category:"—", tags:[], photoQuery:"Ukraine", desc:"Зміни фільтр або натисни “Скинути”." }];
-  const n = items.length;
-
-  // параметри каруселі
-  const radius = 380;      // дистанція по Z
-  const spread = 360 / Math.max(n, 6); // щоб не злипалось, якщо мало карток
-
-  items.forEach((p, i)=>{
-    const card = document.createElement("div");
-    card.className = "c-card";
-
-    const imgWrap = document.createElement("div");
-    imgWrap.className = "img";
-
-    const img = document.createElement("img");
-    img.loading = "lazy";
-    img.alt = p.name || "place";
-    img.src = photoUrl(p.photoQuery || p.name || "Ukraine");
-
-    const shade = document.createElement("div");
-    shade.className = "shade";
-
-    imgWrap.appendChild(img);
-    imgWrap.appendChild(shade);
-
-    const body = document.createElement("div");
-    body.className = "c-body";
-
-    const t = document.createElement("div");
-    t.className = "title";
-    t.textContent = p.name;
-
-    const m = document.createElement("div");
-    m.className = "meta";
-    m.textContent = `${p.region || "—"} · ${p.category || "—"}`;
-
-    const tags = document.createElement("div");
-    tags.className = "tags";
-    (p.tags || []).slice(0,4).forEach(x=>{
-      const s = document.createElement("span");
-      s.className = "tag";
-      s.textContent = x;
-      tags.appendChild(s);
-    });
-
-    body.appendChild(t);
-    body.appendChild(m);
-    body.appendChild(tags);
-
-    card.appendChild(imgWrap);
-    card.appendChild(body);
-
-    // позиціюємо по колу
-    const theta = (i - currentIndex) * spread;
-    const transform = `rotateY(${theta}deg) translateZ(${radius}px)`;
-    card.style.transform = transform;
-
-    // центральна картка
-    const isCenter = (i === currentIndex);
-    card.style.opacity = isCenter ? "1" : "0.65";
-    card.style.filter = isCenter ? "none" : "blur(0.4px)";
-    card.style.pointerEvents = isCenter ? "auto" : "none";
-
-    card.addEventListener("click", ()=>{
-      if (!filtered.length) return;
-      showDetails(filtered[currentIndex]);
-      detailsEl.style.display = "grid";
-    });
-
-    carouselEl.appendChild(card);
-  });
-
-  // загальний поворот сцени
-  carouselEl.style.transform = `rotateY(${angle}deg)`;
+function mapsUrl(place){
+  if (place.coord && place.coord.includes(",")) return `https://www.google.com/maps?q=${encodeURIComponent(place.coord)}`;
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.name + " Україна")}`;
 }
+function officialUrl(){ return "https://alerts.in.ua/"; }
 
 function showDetails(place){
+  lastWinner = place;
   const days = Number(daysSel.value);
-  dTitle.textContent = `${place.name} — ${place.region} · ${place.category}`;
-  dDesc.textContent = place.desc;
 
-  // маршрут
+  dTitle.textContent = `${place.name} — ${place.region} · ${place.category}`;
+  dDesc.textContent = place.desc || "";
   dRoute.innerHTML = "";
+
   const mkList = (title, items)=>{
     const wrap = document.createElement("div");
     wrap.style.marginBottom = "10px";
@@ -576,37 +533,153 @@ function showDetails(place){
         await navigator.share({ title: place.name, text, url: location.href });
       } else {
         await navigator.clipboard.writeText(text + "\n" + location.href);
-        alert("Скопійовано ✅");
+        showToast("Скопійовано ✅");
       }
     } catch {}
   };
 }
 
-/* =========================
-   SPIN / PICK
-========================= */
+function renderCarousel(){
+  carouselEl.innerHTML = "";
+
+  const items = filtered.length
+    ? filtered
+    : [{
+        id:"empty",
+        name:"Немає місць",
+        region:"—",
+        category:"—",
+        tags:["зміни фільтр","або скинь"],
+        photoQuery:"",
+        desc:"Зміни фільтр або натисни “Скинути”.",
+        day1:["Спробуй інший регіон/категорію","Зміни тривалість 1/2 дні","Натисни “Скинути” для повторів"],
+        day2:[]
+      }];
+
+  const n = items.length;
+  const radius = 380;
+  const spread = 360 / Math.max(n, 7);
+
+  items.forEach((p, i)=>{
+    const card = document.createElement("div");
+    card.className = "c-card";
+
+    const imgWrap = document.createElement("div");
+    imgWrap.className = "img";
+
+    const img = document.createElement("img");
+    img.alt = p.name || "place";
+
+    // Poster always present
+    const poster = document.createElement("div");
+    poster.className = "poster";
+    poster.innerHTML = `
+      <div class="pTitle">${escapeHtml(p.name || "UA Travel")}</div>
+      <div class="pMeta">${escapeHtml(p.region || "—")} · ${escapeHtml(p.category || "—")}</div>
+      <div class="pBadges">
+        ${(p.tags||[]).slice(0,3).map(t=>`<span class="pBadge">${escapeHtml(t)}</span>`).join("")}
+      </div>
+    `;
+
+    // Try online image. If loaded => show img, but poster remains under shade.
+    const url = onlinePhotoUrl(p.photoQuery || p.name);
+    let showed = false;
+
+    img.onload = () => {
+      showed = true;
+      img.style.display = "block";
+      poster.style.opacity = "0.25"; // keep style, but give priority to photo
+    };
+    img.onerror = () => {
+      // stay poster-only
+    };
+
+    // hard timeout: if blocked, keep poster, don't wait forever
+    setTimeout(()=>{ if(!showed){ /* noop */ } }, 2500);
+
+    img.src = url;
+
+    const shade = document.createElement("div");
+    shade.className = "shade";
+
+    imgWrap.appendChild(poster);
+    imgWrap.appendChild(img);
+    imgWrap.appendChild(shade);
+
+    const body = document.createElement("div");
+    body.className = "c-body";
+
+    const t = document.createElement("div");
+    t.className = "title";
+    t.textContent = p.name;
+
+    const m = document.createElement("div");
+    m.className = "meta";
+    m.textContent = `${p.region || "—"} · ${p.category || "—"}`;
+
+    const tags = document.createElement("div");
+    tags.className = "tags";
+    (p.tags || []).slice(0,4).forEach(x=>{
+      const s = document.createElement("span");
+      s.className = "tag";
+      s.textContent = x;
+      tags.appendChild(s);
+    });
+
+    body.appendChild(t);
+    body.appendChild(m);
+    body.appendChild(tags);
+
+    card.appendChild(imgWrap);
+    card.appendChild(body);
+
+    const theta = (i - currentIndex) * spread;
+    card.style.transform = `rotateY(${theta}deg) translateZ(${radius}px)`;
+
+    const isCenter = (i === currentIndex);
+    card.style.opacity = isCenter ? "1" : "0.65";
+    card.style.filter = isCenter ? "none" : "blur(0.4px)";
+    card.style.pointerEvents = isCenter ? "auto" : "none";
+
+    card.addEventListener("click", ()=>{
+      if (items[0].id === "empty") return;
+      showDetails(items[currentIndex]);
+      detailsEl.classList.add("show");
+    });
+
+    carouselEl.appendChild(card);
+  });
+
+  carouselEl.style.transform = `rotateY(${angle}deg)`;
+}
+
+function escapeHtml(s){
+  return String(s || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
 function spin(){
   if (spinning) return;
-
   if (!filtered.length){
-    alert("Немає місць під фільтр. Зміни фільтр або натисни “Скинути”.");
+    showToast("Немає місць під фільтр. Зміни фільтр або натисни “Скинути”.");
     return;
   }
-
   spinning = true;
-  detailsEl.style.display = "none";
+  spinBtn.disabled = true;
+  detailsEl.classList.remove("show");
 
-  // випадково вибираємо наступний індекс як “переможець”
   const targetIndex = Math.floor(Math.random() * filtered.length);
   const n = filtered.length;
 
-  // скільки кроків прокрутити, щоб виглядало круто (мінімум 2 кола)
-  const loops = 2 + Math.floor(Math.random()*2); // 2-3 loops
+  const loops = 2 + Math.floor(Math.random()*2);
   const steps = loops * n + ((targetIndex - currentIndex + n) % n);
 
   const start = performance.now();
   const dur = 1600 + Math.random()*700;
-
   const startIdx = currentIndex;
 
   function easeOutCubic(t){ return 1 - Math.pow(1-t,3); }
@@ -615,57 +688,55 @@ function spin(){
     const t = Math.min(1, (now - start) / dur);
     const e = easeOutCubic(t);
 
-    // прогрес у “кроках”
     const prog = Math.floor(e * steps);
     currentIndex = (startIdx + prog) % n;
 
-    // трохи “качання” сцени
-    angle = - (e * steps * 14); // degrees
+    angle = - (e * steps * 14);
     renderCarousel();
 
     if (t < 1){
       requestAnimationFrame(frame);
     } else {
-      // фінал
       currentIndex = targetIndex;
       angle = -steps * 14;
       renderCarousel();
 
-      // mark seen
       const win = filtered[currentIndex];
+
       seen.add(win.id);
       saveSeen();
 
-      // перерахувати filtered (прибрати вигране)
       applyFilters();
 
-      // показати деталі переможця
       showDetails(win);
-      detailsEl.style.display = "grid";
+      detailsEl.classList.add("show");
 
       spinning = false;
+      spinBtn.disabled = false;
+      showToast(`Випало: ${win.name}`);
     }
   }
   requestAnimationFrame(frame);
 }
 
 spinBtn.addEventListener("click", spin);
-document.addEventListener("keydown", (e)=>{
-  if (e.code === "Space"){ e.preventDefault(); spin(); }
-});
+document.addEventListener("keydown", (e)=>{ if (e.code === "Space"){ e.preventDefault(); spin(); } });
 
 resetBtn.addEventListener("click", ()=>{
   if (confirm("Скинути унікальність (повтори знову дозволені)?")){
     seen = new Set();
     saveSeen();
     applyFilters();
-    alert("Скинуто ✅");
+    showToast("Скинуто ✅");
   }
 });
 
 toggleDetailsBtn.addEventListener("click", ()=>{
-  if (detailsEl.style.display === "none") detailsEl.style.display = "grid";
-  else detailsEl.style.display = "none";
+  if (!lastWinner){
+    showToast("Спочатку натисни “Крутити”.");
+    return;
+  }
+  detailsEl.classList.toggle("show");
 });
 
 // init
